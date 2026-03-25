@@ -25,6 +25,16 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
+## API Documentation (Swagger)
+
+After starting the server, open Swagger UI at:
+
+```text
+http://localhost:3000/api/docs
+```
+
+Use the `POST /auth/login` endpoint to get `access_token`, then click **Authorize** in Swagger and paste the token.
+
 ## Project setup
 
 ```bash

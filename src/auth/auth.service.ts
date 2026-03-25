@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common';
-import { UsersService } from '../users/users.service';
-import * as bcrypt from 'bcrypt';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UnauthorizedException } from '@nestjs/common';
-import { CreateUserDto } from 'src/users/dto/create-user.dto';
+import * as bcrypt from 'bcrypt';
+import { UsersService } from '../users/users.service';
+import { LoginDto } from './dto/login.dto';
+import { RegisterDto } from './dto/register.dto';
 
 @Injectable()
 export class AuthService {
@@ -12,24 +12,21 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  // ✅ REGISTER
-  async register(dto: CreateUserDto) {
-    const hashedPassword = await bcrypt.hash(dto.password, 10);
-
-    const user = await this.usersService.createAuthUser(dto);
-
-    return user;
+  async register(dto: RegisterDto) {
+    return this.usersService.createAuthUser(dto);
   }
 
-  // ✅ LOGIN
-  async login(data: any) {
+  async login(data: LoginDto) {
     const user = await this.usersService.findByEmail(data.email);
 
-    if (!user) throw new UnauthorizedException('Invalid credentials');
+    if (!user) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
 
     const isMatch = await bcrypt.compare(data.password, user.password);
-
-    if (!isMatch) throw new UnauthorizedException('Invalid credentials');
+    if (!isMatch) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
 
     const payload = { sub: user._id, email: user.email, role: user.role };
 
